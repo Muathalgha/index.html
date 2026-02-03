@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>لعبة الذاكرة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1e1e2f;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .game {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background: #444;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .card.flipped {
+            background: #00adb5;
+        }
+
+        .card.matched {
+            background: #4caf50;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game" id="game"></div>
+
+<script>
+    const symbols = ['🍎','🍌','🍇','🍒','🍍','🥝','🍉','🍓'];
+    let cards = [...symbols, ...symbols];
+    cards.sort(() => 0.5 - Math.random());
+
+    const game = document.getElementById("game");
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+
+    cards.forEach(symbol => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.dataset.symbol = symbol;
+        card.innerHTML = "❓";
+
+        card.addEventListener("click", () => {
+            if (lockBoard || card === firstCard) return;
+
+            card.classList.add("flipped");
+            card.innerHTML = symbol;
+
+            if (!firstCard) {
+                firstCard = card;
+            } else {
+                secondCard = card;
+                lockBoard = true;
+
+                if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+                    firstCard.classList.add("matched");
+                    secondCard.classList.add("matched");
+                    resetBoard();
+                } else {
+                    setTimeout(() => {
+                        firstCard.classList.remove("flipped");
+                        secondCard.classList.remove("flipped");
+                        firstCard.innerHTML = "❓";
+                        secondCard.innerHTML = "❓";
+                        resetBoard();
+                    }, 1000);
+                }
+            }
+        });
+
+        game.appendChild(card);
+    });
+
+    function resetBoard() {
+        firstCard = null;
+        secondCard = null;
+        lockBoard = false;
+    }
+</script>
+
+</body>
+</html>
